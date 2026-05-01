@@ -9,6 +9,7 @@ Load Libraries
 #| message: false
 library(palmerpenguins)
 library(dplyr)
+library(dbplyr)
 library(tidyr)
 library(pins)
 library(vetiver)
@@ -34,12 +35,13 @@ Model
 model <- lm(body_mass_g ~ bill_length_mm + species + sex, data = data)
 ```
 
-##Results 
-R^2
+##Results R\^2
+
 ```{r}
 summary(model)$r.squared
 
 ```
+
 Intercept and Coefficients
 
 ```{r}
@@ -53,11 +55,13 @@ colnames(model.matrix(model))
 ```
 
 Create a vetiver model
+
 ```{r}
 v <- vetiver_model(model, "penguins_model")
 ```
 
 Save to Board
+
 ```{r}
 model_board <- board_folder("~/data/model", versioned = TRUE)
 
@@ -67,4 +71,3 @@ vetiver_pin_write(model_board, v)
 ```{r}
 DBI::dbDisconnect(con)
 ```
-
