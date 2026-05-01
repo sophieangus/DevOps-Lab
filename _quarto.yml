@@ -6,6 +6,8 @@ website:
   title: "Penguin DevOps Lab"
   navbar:
     left:
+      - href: index.qmd
+        text: Home
       - href: eda.qmd
         text: EDA
       - href: model.qmd

@@ -3,7 +3,7 @@
     "path": "~/Documents/R Studio Projects/Dev Ops Lab/_quarto.yml",
     "project_path": "_quarto.yml",
     "type": "yaml",
-    "hash": "0",
+    "hash": "4077756707",
     "contents": "",
     "dirty": false,
     "created": 1777649998800.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "7,0",
+        "cursorPosition": "13,24",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1777651475,
+    "lastKnownWriteTime": 1777657080,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1777651475,
+    "last_content_update": 1777657080617,
     "read_only": false,
     "read_only_alternatives": []
 }

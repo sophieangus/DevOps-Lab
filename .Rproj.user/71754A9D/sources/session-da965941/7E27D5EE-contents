@@ -1,7 +1,22 @@
 project:
   type: website
   output-dir: _site
-  title: "Dev Ops Lab"
+  
+website:
+  title: "Penguin DevOps Lab"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: eda.qmd
+        text: EDA
+      - href: model.qmd
+        text: Model Building
+
+format:
+  html:
+    theme: cosmo
+    toc: true
 
 editor: visual
 

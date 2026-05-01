@@ -1,0 +1,1 @@
+"0","model <- lm(body_mass_g ~ bill_length_mm + species + sex, data = data)"
