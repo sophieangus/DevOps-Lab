@@ -1,0 +1,70 @@
+---
+title: "Penguins Model"
+format: html
+---
+
+Load Libraries
+
+```{r}
+#| message: false
+library(palmerpenguins)
+library(dplyr)
+library(tidyr)
+library(pins)
+library(vetiver)
+```
+
+Load in the Data
+
+```{r}
+con <- DBI::dbConnect(
+  duckdb::duckdb(), 
+  dbdir = "my-db.duckdb"
+  )
+data <- dplyr::tbl(con, "penguins") |>
+  collect() |>
+  drop_na()
+
+head(data, 3)
+```
+
+Model
+
+```{r}
+model <- lm(body_mass_g ~ bill_length_mm + species + sex, data = data)
+```
+
+##Results 
+R^2
+```{r}
+summary(model)$r.squared
+
+```
+Intercept and Coefficients
+
+```{r}
+summary(model)$coefficients
+```
+
+Column names used in the model matrix
+
+```{r}
+colnames(model.matrix(model))
+```
+
+Create a vetiver model
+```{r}
+v <- vetiver_model(model, "penguins_model")
+```
+
+Save to Board
+```{r}
+model_board <- board_folder("~/data/model", versioned = TRUE)
+
+vetiver_pin_write(model_board, v)
+```
+
+```{r}
+DBI::dbDisconnect(con)
+```
+

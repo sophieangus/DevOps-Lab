@@ -1,0 +1,7 @@
+project:
+  type: website
+  output-dir: _site
+  title: "Dev Ops Lab"
+
+editor: visual
+

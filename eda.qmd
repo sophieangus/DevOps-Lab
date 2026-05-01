@@ -1,0 +1,55 @@
+---
+title: "Penguins EDA"
+format: html
+---
+
+
+```{r}
+#| message: false
+library(palmerpenguins)
+library(dplyr)
+library(ggplot2)
+
+con <- DBI::dbConnect(
+  duckdb::duckdb(), 
+  dbdir = "my-db.duckdb"
+  )
+data <- dplyr::tbl(con, "penguins")
+```
+Penguin Sizes and Mass by Species
+```{r}
+#| message: false
+data |> 
+  group_by(species, sex) |> 
+  summarise(
+    n = n(),
+    mean_body_mass = mean(body_mass_g, na.rm = TRUE),
+    mean_bill_length = mean(bill_length_mm, na.rm = TRUE),
+    mean_flipper_length = mean(flipper_length_mm, na.rm = TRUE),
+    mean_bill_depth = mean(bill_depth_mm, na.rm = TRUE)
+    ) |> 
+  knitr::kable()
+  
+```
+
+
+Comparison of body mass and bill length by species
+
+```{r}
+#| warning: false
+ggplot(data, mapping= aes(x = bill_length_mm, y = body_mass_g, color = species)) +
+geom_point(size = 1) + 
+  scale_color_brewer(palette = "Set2") +
+geom_smooth(method = "lm") +
+  labs(
+    title = "Penguin Body Mass vs Bill Length",
+    x = "Bill Length (mm)",
+    y = "Body Mass (g)"
+  )
+
+```
+```{r}
+DBI::dbDisconnect(con)
+```
+
+

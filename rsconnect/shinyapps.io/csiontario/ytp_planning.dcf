@@ -1,0 +1,10 @@
+name: ytp_planning
+title:
+username: csiontario
+account: csiontario
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16896520
+bundleId: 11731659
+url: https://csiontario.shinyapps.io/ytp_planning/
+version: 1
