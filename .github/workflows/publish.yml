@@ -30,6 +30,7 @@ jobs:
         env:
           # Use the 'focal' or 'jammy' binary repo for Ubuntu runners
           RENV_CONFIG_REPOS_OVERRIDE: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+          options(repos = c(CRAN = "https://packagemanager.posit.co/cran/__linux__/jammy/latest"))
 
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
