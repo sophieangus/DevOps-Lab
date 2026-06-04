@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://sophieangus.github.io/DevOps-Lab/Dev Ops Lab.html</loc>
-    <lastmod>2026-05-01T17:38:46.630Z</lastmod>
-  </url>
-  <url>
-    <loc>https://sophieangus.github.io/DevOps-Lab/index.html</loc>
-    <lastmod>2026-05-01T17:38:46.644Z</lastmod>
-  </url>
-  <url>
     <loc>https://sophieangus.github.io/DevOps-Lab/model.html</loc>
-    <lastmod>2026-05-01T17:38:46.644Z</lastmod>
+    <lastmod>2026-06-04T16:59:18.980Z</lastmod>
   </url>
   <url>
     <loc>https://sophieangus.github.io/DevOps-Lab/eda.html</loc>
-    <lastmod>2026-05-01T17:38:46.644Z</lastmod>
+    <lastmod>2026-06-04T16:59:18.980Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sophieangus.github.io/DevOps-Lab/Dev Ops Lab.html</loc>
+    <lastmod>2026-06-04T16:59:18.969Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sophieangus.github.io/DevOps-Lab/index.html</loc>
+    <lastmod>2026-06-04T16:59:18.980Z</lastmod>
   </url>
 </urlset>
