@@ -22,16 +22,16 @@ jobs:
           known_hosts: "unnecessary"
           if_key_exists: replace
 
-      # NEW STEP: Copy your local files (including plumber.R) to the EC2 server
+      # Move files using the active EC2 IP
       - name: Copy project files to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@18.217.18.5 "mkdir -p /home/ubuntu/app"
-          scp -o StrictHostKeyChecking=no plumber.R ubuntu@18.217.18.5:/home/ubuntu/app/plumber.R
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@3.133.85.99 "mkdir -p /home/ubuntu/app"
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa plumber.R ubuntu@3.133.85.99:/home/ubuntu/app/plumber.R
 
-      # Deploys and launches the container on your live EC2 IP with S3 credentials
+      # Run the container environment with live S3 credentials
       - name: Deploy to EC2 via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@18.217.18.5 << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@3.133.85.99 << 'EOF'
             # 1. Update system and install Docker if missing
             sudo apt-get update && sudo apt-get install -y docker.io
             sudo systemctl start docker
