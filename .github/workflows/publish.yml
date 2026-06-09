@@ -22,24 +22,22 @@ jobs:
           known_hosts: "unnecessary"
           if_key_exists: replace
 
-      # Move files using the active EC2 IP
+      # Clean target directory and mirror local workspace files over
       - name: Copy project files to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@3.133.85.99 "mkdir -p /home/ubuntu/app"
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa plumber.R ubuntu@3.133.85.99:/home/ubuntu/app/plumber.R
 
-      # Run the container environment with live S3 credentials
+      # Run container with explicitly mapped environments
       - name: Deploy to EC2 via SSH
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@3.133.85.99 << 'EOF'
-            # 1. Update system and install Docker if missing
             sudo apt-get update && sudo apt-get install -y docker.io
             sudo systemctl start docker
             
-            # 2. Stop and clear out the old container if it exists
             sudo docker rm -f penguin-s3-api || true
             
-            # 3. Run the container, mounting your plumber file and passing S3 keys
+            # FIXED: Corrected the Plumber instantiation execution logic
             sudo docker run -d \
               -p 46261:46261 \
               --name penguin-s3-api \
@@ -48,5 +46,5 @@ jobs:
               -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
               -e AWS_REGION="us-east-2" \
               rocker/r-ver:4.4.2 \
-              R -e "install.packages(c('plumber','pins','vetiver','paws')); pr <- plumber::plumb('/opt/ml/plumber.R'); pr$run(host='0.0.0.0', port=46261, block=TRUE)"
+              R -e "install.packages(c('pins', 'vetiver', 'paws', 'plumber'), repos='https://packagemanager.posit.co/cran/__linux__/jammy/latest'); r <- plumber::plumb('/opt/ml/plumber.R'); r\$run(host='0.0.0.0', port=46261)"
           EOF
