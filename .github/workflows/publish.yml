@@ -22,13 +22,13 @@ jobs:
           known_hosts: "unnecessary"
           if_key_exists: replace
 
-      # Clean target directory and mirror local workspace files over
+      # Mirror local workspace files over to the EC2 host
       - name: Copy project files to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@3.133.85.99 "mkdir -p /home/ubuntu/app"
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa plumber.R ubuntu@3.133.85.99:/home/ubuntu/app/plumber.R
 
-      # Run container with explicitly mapped environments
+      # Safe deploy using an environment file to prevent string corruption
       - name: Deploy to EC2 via SSH
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@3.133.85.99 << 'EOF'
@@ -37,14 +37,20 @@ jobs:
             
             sudo docker rm -f penguin-s3-api || true
             
-            # FIXED: Corrected the Plumber instantiation execution logic
+            # Write secrets to a safe local file inside the EC2 host first
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" > /home/ubuntu/app/.env
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> /home/ubuntu/app/.env
+            echo "AWS_REGION=us-east-2" >> /home/ubuntu/app/.env
+            
+            # FIXED: Switched to rocker/tidyverse to guarantee pre-compiled system libraries like stringi work out of the box
             sudo docker run -d \
               -p 46261:46261 \
               --name penguin-s3-api \
               -v /home/ubuntu/app:/opt/ml \
-              -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
-              -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-              -e AWS_REGION="us-east-2" \
-              rocker/r-ver:4.4.2 \
+              --env-file /home/ubuntu/app/.env \
+              rocker/tidyverse:4.4.2 \
               R -e "install.packages(c('pins', 'vetiver', 'paws', 'plumber'), repos='https://packagemanager.posit.co/cran/__linux__/jammy/latest'); r <- plumber::plumb('/opt/ml/plumber.R'); r\$run(host='0.0.0.0', port=46261)"
+              
+            # Clean up the raw secret file from the host filesystem
+            rm -f /home/ubuntu/app/.env
           EOF
