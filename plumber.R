@@ -19,7 +19,7 @@ model_board <- board_s3(
 v <- vetiver_pin_read(model_board, "penguins_model")
 
 # 3. Create the Plumber API router
-#| api-title: "Penguins Model API"
-#| api-description: "Predicting penguin body mass from S3 cloud artifacts"
+#* @apiTitle Penguins Model API
+#* @apiDescription Predicting penguin body mass from S3 cloud artifacts
 pr() |>
   vetiver_api(v)
