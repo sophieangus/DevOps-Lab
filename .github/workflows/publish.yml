@@ -3,37 +3,50 @@ on:
   push:
     branches: main
 
-name: Quarto Publish
+name: Optimize Dockerfile package
 
 jobs:
-  build-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Install R
-        uses: r-lib/actions/setup-r@v2
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
         with:
-          r-version: '4.2.0'
-          use-public-rspm: true
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: "unnecessary"
+          if_key_exists: replace
 
-      - name: Setup renv and install packages
-        uses: r-lib/actions/setup-renv@v2
-        with:
-          cache-version: 1
-        env:
-          # Use the 'focal' or 'jammy' binary repo for Ubuntu runners
-          RENV_CONFIG_REPOS_OVERRIDE: https://packagemanager.posit.co/cran/__linux__/jammy/latest
+      # NEW STEP: Copy your local files (including plumber.R) to the EC2 server
+      - name: Copy project files to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@18.217.18.5 "mkdir -p /home/ubuntu/app"
+          scp -o StrictHostKeyChecking=no plumber.R ubuntu@18.217.18.5:/home/ubuntu/app/plumber.R
 
-      - name: Render and Publish
-        uses: quarto-dev/quarto-actions/publish@v2
-        with:
-          target: gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Deploys and launches the container on your live EC2 IP with S3 credentials
+      - name: Deploy to EC2 via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@18.217.18.5 << 'EOF'
+            # 1. Update system and install Docker if missing
+            sudo apt-get update && sudo apt-get install -y docker.io
+            sudo systemctl start docker
+            
+            # 2. Stop and clear out the old container if it exists
+            sudo docker rm -f penguin-s3-api || true
+            
+            # 3. Run the container, mounting your plumber file and passing S3 keys
+            sudo docker run -d \
+              -p 46261:46261 \
+              --name penguin-s3-api \
+              -v /home/ubuntu/app:/opt/ml \
+              -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+              -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+              -e AWS_REGION="us-east-2" \
+              rocker/r-ver:4.4.2 \
+              R -e "install.packages(c('plumber','pins','vetiver','paws')); pr <- plumber::plumb('/opt/ml/plumber.R'); pr$run(host='0.0.0.0', port=46261, block=TRUE)"
+          EOF

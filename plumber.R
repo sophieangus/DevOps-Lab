@@ -22,5 +22,4 @@ v <- vetiver_pin_read(model_board, "penguins_model")
 #| api-title: "Penguins Model API"
 #| api-description: "Predicting penguin body mass from S3 cloud artifacts"
 pr() |>
-  vetiver_api(v) |>
-  pr_run(port = 8080)
+  vetiver_api(v)
